@@ -12,7 +12,6 @@ embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-
 
 
 def load_documents():
-    """Load every .pdf and .txt file in data/ into LangChain Document objects."""
     docs = []
     for filename in os.listdir(DATA_DIR):
         path = os.path.join(DATA_DIR, filename)
@@ -24,9 +23,8 @@ def load_documents():
 
 
 def build_vectorstore():
-    """Ingestion pipeline: load -> split into chunks -> embed -> persist to disk."""
     if os.path.exists(CHROMA_DIR):
-        shutil.rmtree(CHROMA_DIR)  # start fresh so re-running doesn't duplicate old chunks
+        shutil.rmtree(CHROMA_DIR)
 
     raw_docs = load_documents()
     if not raw_docs:

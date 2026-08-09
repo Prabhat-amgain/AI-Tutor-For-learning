@@ -1,19 +1,13 @@
 from app.llm_client import TutorSession
 
-session = TutorSession(user_name="Bibek")
+USER = "TestStudent"
 
-sample_questions = [
-    "What is a variable in programming?",
-    "What is a loop?",
-    "What is a function?",
-    "What is an array?",
-    "What is a linked list?",
-    "What is a stack?",
-    "What is a queue?",
-    "What is recursion?",
-    "What is Big-O notation?",
-    "What is a binary tree?",
-]
+print("=== SESSION 1 ===")
+session1 = TutorSession(user_name=USER)
+print("System context injected:\n", session1.history[0].content, "\n")
+print(session1.study_topic("Binary Search Trees"))
 
-for q in sample_questions:
-    session.ask(q)
+print("\n=== SESSION 2 (a brand-new TutorSession object) ===")
+session2 = TutorSession(user_name=USER)
+print("System context injected:\n", session2.history[0].content, "\n")
+print(session2.ask("What should I study next, based on what I've already covered?"))

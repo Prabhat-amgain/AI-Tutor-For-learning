@@ -1,0 +1,11 @@
+{
+  "TestStudent": {
+    "topics_studied": [
+      {
+        "topic": "Binary Search Trees",
+        "date": "2026-08-09"
+      }
+    ],
+    "preferred_level": "undergraduate"
+  }
+}

@@ -4,14 +4,8 @@ import operator
 from langchain.tools import tool
 from app.prompting.templates import generate_study_plan
 from app.prompting.zero_shot import summarize_notes
+from app.rag.retriever import retrieve_relevant_chunks
 
-
-# Only these operations are allowed. This matters: a naive calculator
-# tool using Python's eval() would execute ANY Python code the model
-# passes it — including things like file access. Since an LLM (not you)
-# decides what string goes into this tool, treat that input as untrusted,
-# the same way you'd treat raw user input on a website. Restricting to a
-# tiny whitelist of math operators closes that hole entirely.
 _ALLOWED_OPS = {
     ast.Add: operator.add, ast.Sub: operator.sub,
     ast.Mult: operator.mul, ast.Div: operator.truediv,
@@ -32,8 +26,7 @@ def _safe_eval(node):
 @tool
 def calculator(expression: str) -> str:
     """Evaluate an arithmetic expression using only the numbers and operators
-    that actually appear in the user's question. Do not invent or reuse
-    example numbers. Supports +, -, *, /, ** and parentheses."""
+    that actually appear in the user's question. Supports +, -, *, /, ** and parentheses."""
     try:
         tree = ast.parse(expression, mode="eval").body
         return str(_safe_eval(tree))
@@ -43,7 +36,7 @@ def calculator(expression: str) -> str:
 
 @tool
 def study_planner(topic: str, days: int = 5, hours_per_day: int = 2) -> str:
-    """Create a day-by-day study plan for a topic, given the number of days and hours available per day."""
+    """Create a day-by-day study plan for a topic, given days and hours per day."""
     return generate_study_plan(topic, days=days, hours_per_day=hours_per_day)
 
 
@@ -51,3 +44,11 @@ def study_planner(topic: str, days: int = 5, hours_per_day: int = 2) -> str:
 def information_summarizer(text: str) -> str:
     """Summarize a block of study material or notes into concise bullet points."""
     return summarize_notes(text)
+
+
+@tool
+def search_notes(query: str) -> str:
+    """Search the student's own uploaded course notes for information relevant
+    to the query. Use this when the question could be answered from material
+    the student has actually studied, not general world knowledge."""
+    return retrieve_relevant_chunks(query)
